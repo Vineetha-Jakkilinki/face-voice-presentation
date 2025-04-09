@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import StepContainer from '@/components/StepContainer';
 import { Mic, MicOff, ArrowRight, Play } from 'lucide-react';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface VoiceStepProps {
   onNext: (audioData: Blob) => void;
