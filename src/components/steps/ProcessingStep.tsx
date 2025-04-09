@@ -1,0 +1,91 @@
+
+import React, { useState, useEffect } from 'react';
+import { Progress } from '@/components/ui/progress';
+import StepContainer from '@/components/StepContainer';
+
+interface ProcessingStepProps {
+  onNext: () => void;
+  processingData: {
+    photo: string;
+    topic: string;
+  };
+}
+
+const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
+  const [progress, setProgress] = useState(0);
+  const [currentStage, setCurrentStage] = useState('Generating script');
+  const stages = [
+    'Generating script',
+    'Cloning voice',
+    'Creating audio narration',
+    'Animating avatar',
+    'Rendering final video',
+  ];
+
+  // Simulate processing stages
+  useEffect(() => {
+    const totalTime = 10000; // 10 seconds for demo
+    const interval = totalTime / (stages.length * 10);
+    
+    let currentProgress = 0;
+    let currentStageIndex = 0;
+    
+    const timer = setInterval(() => {
+      currentProgress += 1;
+      setProgress(currentProgress);
+      
+      // Update stage text
+      if (currentProgress % 20 === 0 && currentStageIndex < stages.length - 1) {
+        currentStageIndex += 1;
+        setCurrentStage(stages[currentStageIndex]);
+      }
+      
+      // Complete processing
+      if (currentProgress >= 100) {
+        clearInterval(timer);
+        setTimeout(() => onNext(), 500);
+      }
+    }, interval);
+    
+    return () => clearInterval(timer);
+  }, [onNext, stages]);
+
+  return (
+    <StepContainer 
+      title="Creating Your Presentation" 
+      description="Please wait while we generate your personalized video."
+    >
+      <div className="flex flex-col items-center">
+        <div className="mb-8 relative w-40 h-40 rounded-full overflow-hidden border-4 border-brand-purple">
+          <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full border-4 border-t-transparent border-brand-purple animate-spin"></div>
+          </div>
+          <img 
+            src={processingData.photo} 
+            alt="Your photo" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <h3 className="text-xl font-medium mb-2">
+          {processingData.topic}
+        </h3>
+        
+        <div className="w-full max-w-md mb-2">
+          <Progress value={progress} className="h-2" />
+        </div>
+        
+        <p className="text-muted-foreground">{currentStage}...</p>
+        
+        <div className="mt-8 p-4 bg-muted/30 rounded-lg max-w-md w-full">
+          <p className="text-sm text-muted-foreground">
+            This would typically take 2-3 minutes with real API processing.
+            We're simulating this step for demonstration purposes.
+          </p>
+        </div>
+      </div>
+    </StepContainer>
+  );
+};
+
+export default ProcessingStep;
