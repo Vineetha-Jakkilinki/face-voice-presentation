@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Progress } from '@/components/ui/progress';
 import StepContainer from '@/components/StepContainer';
+import { Sparkles } from 'lucide-react';
 
 interface ProcessingStepProps {
   onNext: () => void;
@@ -56,28 +57,34 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
       description="Please wait while we generate your personalized video."
     >
       <div className="flex flex-col items-center">
-        <div className="mb-8 relative w-40 h-40 rounded-full overflow-hidden border-4 border-brand-purple">
-          <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center">
-            <div className="h-16 w-16 rounded-full border-4 border-t-transparent border-brand-purple animate-spin"></div>
+        <div className="mb-8 relative">
+          <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-purple to-brand-blue rounded-full blur-md animate-pulse-subtle"></div>
+          <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-background shadow-lg relative z-10">
+            <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center backdrop-blur-sm">
+              <div className="h-16 w-16 rounded-full border-4 border-t-transparent border-brand-purple animate-spin"></div>
+            </div>
+            <img 
+              src={processingData.photo} 
+              alt="Your photo" 
+              className="w-full h-full object-cover"
+            />
           </div>
-          <img 
-            src={processingData.photo} 
-            alt="Your photo" 
-            className="w-full h-full object-cover"
-          />
         </div>
         
-        <h3 className="text-xl font-medium mb-2">
+        <h3 className="text-xl font-medium mb-4">
           {processingData.topic}
         </h3>
         
-        <div className="w-full max-w-md mb-2">
+        <div className="w-full max-w-md mb-3">
           <Progress value={progress} className="h-2" />
         </div>
         
-        <p className="text-muted-foreground">{currentStage}...</p>
+        <div className="flex items-center gap-2 mb-8">
+          <Sparkles className="h-4 w-4 text-brand-purple animate-pulse" />
+          <p className="text-muted-foreground font-medium">{currentStage}...</p>
+        </div>
         
-        <div className="mt-8 p-4 bg-muted/30 rounded-lg max-w-md w-full">
+        <div className="mt-4 p-5 bg-muted/30 rounded-lg max-w-md w-full border border-border">
           <p className="text-sm text-muted-foreground">
             This would typically take 2-3 minutes with real API processing.
             We're simulating this step for demonstration purposes.

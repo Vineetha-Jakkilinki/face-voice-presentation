@@ -16,7 +16,7 @@ const StepContainer = ({ children, className, title, description }: StepContaine
         <h2 className="text-3xl font-bold gradient-heading mb-3">{title}</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{description}</p>
       </div>
-      <div className="step-card animate-fade-in">
+      <div className="step-card animate-fade-in shadow-md hover:shadow-lg transition-all duration-300">
         {children}
       </div>
     </div>

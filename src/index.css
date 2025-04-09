@@ -33,7 +33,7 @@
     --input: 214 32% 91%;
     --ring: 264 80% 74%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -73,7 +73,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -84,11 +84,11 @@
   }
   
   .card-gradient {
-    @apply bg-gradient-to-br from-white to-secondary/50 dark:from-secondary/10 dark:to-background;
+    @apply bg-gradient-to-br from-white to-secondary/50 dark:from-secondary/10 dark:to-background shadow-md hover:shadow-lg transition-all duration-300;
   }
 
   .btn-gradient {
-    @apply bg-gradient-to-r from-brand-purple to-brand-blue hover:brightness-105 transition-all;
+    @apply bg-gradient-to-r from-brand-purple to-brand-blue hover:brightness-105 transition-all duration-300 shadow-md hover:shadow-lg;
   }
   
   .step-container {
@@ -96,6 +96,60 @@
   }
   
   .step-card {
-    @apply bg-white rounded-xl shadow-lg p-8 border border-border;
+    @apply bg-white dark:bg-card rounded-xl shadow-lg p-8 border border-border transition-colors duration-300;
+  }
+
+  /* Form elements styling */
+  .form-input {
+    @apply rounded-lg border-input bg-background px-4 py-2 text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+
+  /* Animation utilities */
+  .hover-scale {
+    @apply transition-transform hover:scale-105 duration-300;
+  }
+
+  .fade-in {
+    @apply animate-fade-in;
+  }
+
+  .spin-slow {
+    @apply animate-spin;
+    animation-duration: 3s;
+  }
+
+  /* Glass effect */
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 dark:bg-black/20 dark:border-white/10;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s infinite;
   }
 }
