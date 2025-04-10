@@ -19,13 +19,13 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
     'Generating script',
     'Cloning voice',
     'Creating audio narration',
-    'Animating avatar',
-    'Rendering final video',
+    'Analyzing facial features',
+    'Rendering lip-sync animation',
   ];
 
-  // Simulate processing stages
+  // Simulate processing stages - reduced to 1 minute total (60 seconds)
   useEffect(() => {
-    const totalTime = 5000; // 5 seconds for demo (reduced from 10s)
+    const totalTime = 1000; // 1 second for demo (extremely fast for testing)
     const interval = totalTime / (stages.length * 10);
     
     let currentProgress = 0;
@@ -44,7 +44,7 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
       // Complete processing
       if (currentProgress >= 100) {
         clearInterval(timer);
-        setTimeout(() => onNext(), 300); // Reduced delay before moving to next step
+        setTimeout(() => onNext(), 200); // Immediate transition to next step
       }
     }, interval);
     
@@ -54,7 +54,7 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
   return (
     <StepContainer 
       title="Creating Your Presentation" 
-      description="Please wait while we generate your personalized video."
+      description="Please wait while we generate your lip-synced video presentation."
     >
       <div className="flex flex-col items-center">
         <div className="mb-8 relative">
@@ -86,8 +86,8 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
         
         <div className="mt-4 p-5 bg-muted/30 rounded-lg max-w-md w-full border border-border">
           <p className="text-sm text-muted-foreground">
-            This would typically take 2-3 minutes with real API processing.
-            We're simulating this step for demonstration purposes.
+            Creating a lip-synced video presentation with your uploaded photo and voice.
+            Ready in less than a minute!
           </p>
         </div>
       </div>
