@@ -21,6 +21,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
 
   const simulateVideoGeneration = () => {
     setIsGenerating(true);
+    setVideoUrl(null);
     
     // In a real implementation, this would call an actual API
     setTimeout(() => {
@@ -53,30 +54,28 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
               <p className="text-lg">Generating your video...</p>
             </div>
           ) : videoUrl ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gradient-to-br from-brand-dark/60 to-transparent">
-              <div className="relative">
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-brand-purple to-brand-blue blur-sm"></div>
-                <div className="h-24 w-24 rounded-full overflow-hidden mb-4 border-2 border-white relative z-10">
-                  <img 
-                    src={processingData.photo} 
-                    alt="Presenter" 
-                    className="w-full h-full object-cover"
-                  />
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gradient-to-br from-brand-dark/60 to-transparent z-10">
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-brand-purple to-brand-blue blur-sm"></div>
+                  <div className="h-24 w-24 rounded-full overflow-hidden mb-4 border-2 border-white relative z-10">
+                    <img 
+                      src={processingData.photo} 
+                      alt="Presenter" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
+                <h3 className="text-xl font-bold mb-2 mt-2">{processingData.topic}</h3>
+                <p className="text-sm opacity-80 mb-4">AI-Generated Presentation</p>
               </div>
-              <h3 className="text-xl font-bold mb-2 mt-2">{processingData.topic}</h3>
-              <p className="text-sm opacity-80 mb-4">AI-Generated Presentation</p>
-              <video 
-                className="absolute inset-0 w-full h-full object-cover -z-10"
-                poster={processingData.photo}
-                autoPlay
-                muted
-                loop
-              >
-                {/* In a real implementation, this would be the actual video URL */}
-                <source src={videoUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              <div className="w-full h-full">
+                <img 
+                  src={videoUrl} 
+                  alt="Video preview" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
@@ -89,10 +88,27 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
         </Card>
 
         <div className="flex flex-wrap gap-4 justify-center">
-          <Button className="btn-gradient transition-all hover:scale-105">
+          <Button 
+            className="btn-gradient transition-all hover:scale-105"
+            onClick={() => {
+              toast({
+                title: "Download started",
+                description: "Your video is being downloaded"
+              });
+            }}
+          >
             <Download className="mr-2 h-4 w-4" /> Download Video
           </Button>
-          <Button variant="outline" className="transition-all hover:bg-accent">
+          <Button 
+            variant="outline" 
+            className="transition-all hover:bg-accent"
+            onClick={() => {
+              toast({
+                title: "Share feature",
+                description: "Sharing functionality would be implemented here"
+              });
+            }}
+          >
             <Share className="mr-2 h-4 w-4" /> Share
           </Button>
           <Button variant="ghost" onClick={onReset} className="transition-all hover:text-primary">
