@@ -25,7 +25,7 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
 
   // Simulate processing stages
   useEffect(() => {
-    const totalTime = 10000; // 10 seconds for demo
+    const totalTime = 5000; // 5 seconds for demo (reduced from 10s)
     const interval = totalTime / (stages.length * 10);
     
     let currentProgress = 0;
@@ -44,7 +44,7 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
       // Complete processing
       if (currentProgress >= 100) {
         clearInterval(timer);
-        setTimeout(() => onNext(), 500);
+        setTimeout(() => onNext(), 300); // Reduced delay before moving to next step
       }
     }, interval);
     

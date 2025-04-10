@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import StepContainer from '@/components/StepContainer';
-import { Download, Share, RefreshCw } from 'lucide-react';
+import { Download, Share, RefreshCw, Play } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 
@@ -24,7 +24,8 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
     setVideoUrl(null);
     
     // In a real implementation, this would call an actual API
-    setTimeout(() => {
+    // For demo purposes, we make sure to always show a result after the timeout
+    const timer = setTimeout(() => {
       // For demo purposes, we're just showing the user's image as a placeholder
       setVideoUrl(processingData.photo);
       setIsGenerating(false);
@@ -33,12 +34,15 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
         title: "Video generated successfully",
         description: "Your AI presentation has been created",
       });
-    }, 3000);
+    }, 3000); // Reduced timeout for demo
+
+    return () => clearTimeout(timer); // Cleanup timeout if component unmounts
   };
   
   // Auto-generate on component mount
   useEffect(() => {
-    simulateVideoGeneration();
+    const cleanup = simulateVideoGeneration();
+    return cleanup;
   }, []);
 
   return (
@@ -68,6 +72,13 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
                 </div>
                 <h3 className="text-xl font-bold mb-2 mt-2">{processingData.topic}</h3>
                 <p className="text-sm opacity-80 mb-4">AI-Generated Presentation</p>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white/20"
+                >
+                  <Play className="mr-1 h-3 w-3" /> Play Presentation
+                </Button>
               </div>
               <div className="w-full h-full">
                 <img 
@@ -96,6 +107,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
                 description: "Your video is being downloaded"
               });
             }}
+            disabled={isGenerating || !videoUrl}
           >
             <Download className="mr-2 h-4 w-4" /> Download Video
           </Button>
@@ -108,6 +120,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
                 description: "Sharing functionality would be implemented here"
               });
             }}
+            disabled={isGenerating || !videoUrl}
           >
             <Share className="mr-2 h-4 w-4" /> Share
           </Button>
