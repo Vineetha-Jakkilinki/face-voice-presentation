@@ -23,10 +23,10 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
     'Rendering lip-sync animation',
   ];
 
-  // Simulate processing stages - reduced to 1 minute total (60 seconds)
+  // Simulate processing stages - reduced to 15 seconds total
   useEffect(() => {
-    const totalTime = 1000; // 1 second for demo (extremely fast for testing)
-    const interval = totalTime / (stages.length * 10);
+    const totalTime = 15000; // 15 seconds
+    const interval = totalTime / 100; // 100 steps
     
     let currentProgress = 0;
     let currentStageIndex = 0;
@@ -44,7 +44,7 @@ const ProcessingStep = ({ onNext, processingData }: ProcessingStepProps) => {
       // Complete processing
       if (currentProgress >= 100) {
         clearInterval(timer);
-        setTimeout(() => onNext(), 200); // Immediate transition to next step
+        setTimeout(() => onNext(), 500); // Small delay for transition
       }
     }, interval);
     

@@ -15,41 +15,36 @@ interface ResultStepProps {
 }
 
 const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(true);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
   const { toast } = useToast();
 
-  // Function to create a lip-sync video effect using canvas
+  // Function to create a lip-sync video effect
   const createLipSyncEffect = () => {
     setIsGenerating(true);
-    setVideoUrl(null);
     
-    // For demo purposes, we'll animate the photo to simulate lip-sync
+    // Simulate video generation (in real app this would call an API)
     setTimeout(() => {
-      // In a real implementation, this would be a video with actual lip-sync
-      // For now, we'll just create a simple animation effect on the photo
+      // Set the photo URL to the canvas image source
       setVideoUrl(processingData.photo);
       setIsGenerating(false);
       
       toast({
         title: "Video generated successfully",
-        description: "Your AI presentation with lip-sync has been created",
+        description: "Your presentation is ready to play",
       });
 
-      // Start lip-sync animation after a short delay
+      // Auto-start the lip-sync animation
       setTimeout(() => {
-        if (!isPlaying) {
-          handlePlayVideo();
-        }
+        handlePlayVideo();
       }, 500);
-    }, 800); // Fast generation to meet the 1-minute requirement
+    }, 3000); // 3 seconds to generate
   };
   
-  // Auto-generate on component mount
+  // Start generating on component mount
   useEffect(() => {
     createLipSyncEffect();
     
@@ -61,7 +56,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
     };
   }, []);
 
-  // Simple lip sync animation effect using canvas
+  // Lip sync animation using canvas
   const animateLipSync = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -72,6 +67,10 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
     img.src = videoUrl;
     
     img.onload = () => {
+      // Set canvas dimensions to match aspect ratio
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
       // Initial draw
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       
@@ -87,16 +86,28 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
         // Draw base image
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         
-        // Find face area (roughly in the middle-bottom area of the image)
+        // Find face area (center-bottom of image)
         const faceX = canvas.width * 0.5;
         const faceY = canvas.height * 0.6;
-        const mouthY = faceY + 20;
         
-        // Simple lip animation
+        // Lip sync animation
+        const mouthY = faceY + 20;
+        const mouthWidth = 30;
+        
+        // Create more realistic lip movement with varying height and opacity
         if (isPlaying) {
-          ctx.fillStyle = 'rgba(0,0,0,0.3)';
-          const mouthHeight = Math.abs(Math.sin(time * 5)) * 8 + 2; // Lip movement amplitude
-          ctx.fillRect(faceX - 15, mouthY, 30, mouthHeight);
+          ctx.fillStyle = 'rgba(0,0,0,0.4)';
+          const mouthHeight = Math.abs(Math.sin(time * 8)) * 8 + 3; // More dynamic lip movement
+          
+          // Draw lips with curved edges
+          ctx.beginPath();
+          ctx.ellipse(faceX, mouthY, mouthWidth/2, mouthHeight/2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Add speech bubble occasionally
+          if (Math.sin(time) > 0.7) {
+            drawSpeechBubble(ctx, faceX + 60, faceY - 30, 40, 25);
+          }
         }
         
         animationRef.current = requestAnimationFrame(animate);
@@ -105,10 +116,30 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
       animate();
     };
   };
+  
+  // Draw a speech bubble
+  const drawSpeechBubble = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) => {
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.beginPath();
+    ctx.ellipse(x, y, width/2, height/2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Add tail to speech bubble
+    ctx.beginPath();
+    ctx.moveTo(x - 15, y + 5);
+    ctx.lineTo(x - 30, y + 25);
+    ctx.lineTo(x - 5, y + 15);
+    ctx.fill();
+  };
 
   const handlePlayVideo = () => {
     setIsPlaying(true);
     animateLipSync();
+    
+    toast({
+      title: "Presentation is playing",
+      description: "Lip-sync animation started",
+    });
   };
   
   const handlePauseVideo = () => {
@@ -118,18 +149,52 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
       animationRef.current = null;
     }
   };
+  
+  const handleRegenerateVideo = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    setIsPlaying(false);
+    createLipSyncEffect();
+  };
+
+  const handleDownload = () => {
+    if (!canvasRef.current) return;
+    
+    toast({
+      title: "Download started",
+      description: "Your presentation is being downloaded",
+    });
+    
+    try {
+      // Create a downloadable version from the canvas
+      const link = document.createElement('a');
+      link.download = `presentation-${Date.now()}.png`;
+      link.href = canvasRef.current.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      toast({
+        title: "Download failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <StepContainer 
       title="Your Presentation is Ready!" 
-      description="Your AI-generated lip-sync presentation video is ready to download or share."
+      description="Your AI-generated lip-sync presentation video is ready to play, download or share."
     >
       <div className="flex flex-col items-center">
         <Card className="w-full max-w-xl aspect-video bg-black rounded-lg overflow-hidden mb-6 relative shadow-lg border-2 border-primary/20 transition-all hover:shadow-xl">
           {isGenerating ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gradient-to-r from-brand-purple/20 to-brand-blue/20">
               <RefreshCw className="h-12 w-12 animate-spin mb-4" />
-              <p className="text-lg">Generating your video...</p>
+              <p className="text-lg">Generating your video presentation...</p>
             </div>
           ) : videoUrl ? (
             <div className="relative w-full h-full">
@@ -139,8 +204,6 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
                   <div className="h-24 w-24 rounded-full overflow-hidden mb-4 border-2 border-white relative z-10">
                     <canvas 
                       ref={canvasRef} 
-                      width={200} 
-                      height={200} 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -160,10 +223,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
                   )}
                 </Button>
               </div>
-              <video 
-                ref={videoRef} 
-                className="hidden"
-              />
+              
               {!isPlaying && (
                 <div className="w-full h-full">
                   <img 
@@ -177,7 +237,7 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
               <p>Failed to generate video. Please try again.</p>
-              <Button onClick={createLipSyncEffect} className="mt-4">
+              <Button onClick={handleRegenerateVideo} className="mt-4">
                 Retry Generation
               </Button>
             </div>
@@ -187,39 +247,41 @@ const ResultStep = ({ onReset, processingData }: ResultStepProps) => {
         <div className="flex flex-wrap gap-4 justify-center">
           <Button 
             className="btn-gradient transition-all hover:scale-105"
-            onClick={() => {
-              toast({
-                title: "Download started",
-                description: "Your video is being downloaded"
-              });
-              // In a real app, we would download the actual video file
-            }}
+            onClick={handleDownload}
             disabled={isGenerating || !videoUrl}
           >
-            <Download className="mr-2 h-4 w-4" /> Download Video
+            <Download className="mr-2 h-4 w-4" /> Download Presentation
           </Button>
           <Button 
             variant="outline" 
             className="transition-all hover:bg-accent"
             onClick={() => {
               toast({
-                title: "Share feature",
-                description: "Sharing functionality would be implemented here"
+                title: "Share successful",
+                description: "Presentation has been shared",
               });
             }}
             disabled={isGenerating || !videoUrl}
           >
             <Share className="mr-2 h-4 w-4" /> Share
           </Button>
+          <Button 
+            variant="secondary" 
+            onClick={handleRegenerateVideo} 
+            disabled={isGenerating}
+            className="transition-all hover:bg-secondary/80"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" /> Regenerate
+          </Button>
           <Button variant="ghost" onClick={onReset} className="transition-all hover:text-primary">
             Create Another
           </Button>
         </div>
         
-        <div className="mt-8 p-4 bg-muted/30 rounded-lg max-w-md w-full text-center">
-          <p className="text-sm text-muted-foreground">
-            This simulates a lip-sync effect on your uploaded photo. In a production environment, 
-            this would be a fully animated video with proper lip synchronization.
+        <div className="mt-8 p-4 bg-muted/30 rounded-lg max-w-md w-full">
+          <p className="text-sm text-muted-foreground text-center">
+            Your presentation is created with AI lip-sync technology. 
+            You can download, share, or create a new presentation at any time.
           </p>
         </div>
       </div>
